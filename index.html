@@ -27,13 +27,33 @@
           Arial,
           sans-serif;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
         padding: 15vh 24px 48px;
       }
 
       main {
         width: 100%;
         max-width: 680px;
+      }
+
+      footer {
+        width: 100%;
+        max-width: 680px;
+        margin-top: auto;
+        padding-top: 32px;
+        font-size: 13px;
+      }
+
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      footer a:hover,
+      footer a:focus-visible {
+        color: var(--blue);
+        text-decoration: underline;
       }
 
       .intro {
@@ -188,6 +208,10 @@
         </form>
       </section>
     </main>
+
+    <footer>
+      <a href="https://syeasar.vercel.app/">syeasar.vercel.app</a>
+    </footer>
 
     <script>
       const topics = [
