@@ -1,586 +1,225 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#090d0b" />
-  <meta
-    name="description"
-    content="Connect to Vision Y3454R, the AI version of Samin Yeasar."
-  />
-  <title>ভীষণ ইয়াসার :: Vision Y3454R</title>
-
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #090d0b;
-      --panel: #0c120e;
-      --border: #293b2e;
-      --green: #73e69a;
-      --text: #c4d1c7;
-      --muted: #708575;
-      --amber: #e9c46a;
-      --red: #ef7777;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% 0%, #132019 0%, transparent 65%),
-        var(--bg);
-      color: var(--text);
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    button:focus-visible,
-    input:focus-visible {
-      outline: 1px solid var(--green);
-      outline-offset: 3px;
-    }
-
-    .page {
-      width: min(900px, 100%);
-      margin: 0 auto;
-      padding: 36px 20px 100px;
-    }
-
-    .eyebrow {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    .terminal {
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: rgba(9, 13, 11, 0.96);
-      box-shadow: 0 20px 90px #0008, 0 0 35px #73e69a08;
-    }
-
-    .titlebar {
-      min-height: 46px;
-      padding: 0 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-      background: #101711;
-    }
-
-    .window-controls {
-      display: flex;
-      gap: 7px;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border: 0;
-      border-radius: 50%;
-      padding: 0;
-    }
-
-    .dot.red {
-      background: var(--red);
-    }
-
-    .dot.yellow {
-      background: var(--amber);
-    }
-
-    .dot.green {
-      background: var(--green);
-    }
-
-    .window-title {
-      flex: 1;
-      color: var(--muted);
-      font-size: 11px;
-      text-align: center;
-    }
-
-    .window-button {
-      background: transparent;
-      border: 0;
-      color: var(--muted);
-      padding: 3px 5px;
-      font-size: 16px;
-    }
-
-    .window-button:hover {
-      color: var(--green);
-    }
-
-    .terminal-body {
-      padding: clamp(16px, 4vw, 32px);
-    }
-
-    .ascii {
-      overflow-x: auto;
-      margin: 0 0 20px;
-      color: var(--green);
-      font-size: clamp(6px, 1.55vw, 12px);
-      line-height: 1.35;
-      white-space: pre;
-      scrollbar-width: thin;
-    }
-
-    .identity {
-      color: var(--green);
-      font-size: 13px;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .amber {
-      color: var(--amber);
-    }
-
-    .intro {
-      margin: 22px 0;
-    }
-
-    .intro p {
-      margin: 5px 0;
-    }
-
-    .divider {
-      height: 1px;
-      margin: 22px 0;
-      background: var(--border);
-    }
-
-    .output {
-      min-height: 90px;
-      overflow-wrap: anywhere;
-    }
-
-    .line {
-      margin: 0 0 8px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .prompt {
-      color: var(--green);
-    }
-
-    .response {
-      margin: 8px 0 18px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .input-row {
-      display: flex;
-      align-items: baseline;
-      gap: 9px;
-    }
-
-    .prompt-label {
-      flex-shrink: 0;
-      color: var(--green);
-    }
-
-    #command-input {
-      width: 100%;
-      min-width: 0;
-      padding: 0;
-      color: var(--text);
-      background: transparent;
-      border: 0;
-      outline: none;
-      caret-color: var(--green);
-    }
-
-    #command-input::placeholder {
-      color: #506353;
-      opacity: 1;
-    }
-
-    .input-help {
-      margin-top: 10px;
-      color: #506353;
-      font-size: 11px;
-    }
-
-    .footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      color: #506353;
-      font-size: 10px;
-    }
-
-    .minimized {
-      display: none;
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 10;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      color: var(--green);
-      background: #101711;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      box-shadow: 0 8px 30px #0008;
-    }
-
-    .minimized:hover {
-      border-color: var(--green);
-    }
-
-    body.is-minimized .terminal {
-      display: none;
-    }
-
-    body.is-minimized .minimized {
-      display: flex;
-    }
-
-    body.is-minimized .page {
-      display: none;
-    }
-
-    .page-note {
-      margin-top: 20px;
-      color: #506353;
-      font-size: 11px;
-      text-align: center;
-    }
-
-    @media (max-width: 480px) {
-      .page {
-        padding: 16px 10px 80px;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vision Y3454R</title>
+    <style>
+      :root {
+        --bg: #f7faff;
+        --text: #34495e;
+        --muted: #829bb1;
+        --blue: #69b8ef;
+        --border: #dceaf5;
       }
 
-      .terminal-body {
-        padding: 18px 14px;
+      * {
+        box-sizing: border-box;
       }
 
-      .window-title {
-        font-size: 9px;
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          16px/1.7 "Helvetica Neue",
+          Arial,
+          sans-serif;
+        display: flex;
+        justify-content: center;
+        padding: 15vh 24px 48px;
       }
 
-      .footer {
-        flex-direction: column;
+      main {
+        width: 100%;
+        max-width: 680px;
       }
 
-      .prompt-label {
-        font-size: 12px;
+      .intro {
+        margin-bottom: 42px;
       }
-    }
 
-    @media (prefers-reduced-motion: no-preference) {
+      .logo {
+        margin: 0 0 28px;
+        color: var(--blue);
+        font: 12px/1.2 "SFMono-Regular", Consolas, monospace;
+        white-space: pre;
+      }
+
+      .intro p {
+        margin: 0 0 8px;
+      }
+      .intro p:first-child {
+        font-size: 17px;
+      }
+      .intro p:last-child {
+        color: var(--muted);
+      }
+
+      .terminal {
+        padding: 4px 0;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 14px;
+      }
+
+      .line {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 18px 0;
+      }
+
+      .prompt {
+        color: var(--blue);
+        flex-shrink: 0;
+      }
+      .question {
+        color: var(--text);
+      }
+
+      #topic {
+        display: inline-block;
+        min-width: 110px;
+        color: var(--blue);
+      }
+
       .cursor {
         display: inline-block;
-        width: 7px;
+        width: 2px;
         height: 15px;
-        margin-left: 4px;
-        vertical-align: middle;
-        background: var(--green);
-        animation: blink 1s steps(2, start) infinite;
+        margin-left: 3px;
+        background: var(--blue);
+        vertical-align: -3px;
+        animation: blink 1s step-end infinite;
       }
 
       @keyframes blink {
-        to {
-          visibility: hidden;
+        50% {
+          opacity: 0;
         }
       }
-    }
-  </style>
-</head>
 
-<body>
-  <main class="page">
-    <div class="eyebrow">Personal AI experiment / 001</div>
+      .input-line {
+        align-items: center;
+      }
 
-    <section class="terminal" aria-label="Vision Y3454R terminal">
-      <header class="titlebar">
-        <div class="window-controls">
-          <button class="dot red" id="close-button" aria-label="Close terminal"></button>
-          <button class="dot yellow" id="minimize-button" aria-label="Minimize terminal"></button>
-          <button class="dot green" id="focus-button" aria-label="Focus terminal"></button>
+      input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+      }
+
+      input::placeholder {
+        color: #a6b8c8;
+      }
+
+      #conversation {
+        margin-top: 0;
+      }
+
+      .conversation-line {
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .reply {
+        color: var(--muted);
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 12vh 20px 32px;
+        }
+        .intro {
+          margin-bottom: 34px;
+        }
+        .line {
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <pre class="logo" role="img" aria-label="Vision Y3454R cartoon logo"> .--------.
+/  o    o  \
+|     ^     |
+|  v1510n   |
+ \_________/</pre>
+
+      <section class="intro">
+        <p>Hi I am AI version of Vision Y3454R.</p>
+        <p>this is the cheapest AI portfolio using simple if-else technoloy</p>
+      </section>
+
+      <section class="terminal">
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="question">
+            hey, what do you wanna talk about?
+            <span id="topic">my music?</span><span class="cursor"></span>
+          </span>
         </div>
 
-        <div class="window-title">vision-y3454r — ssh session</div>
-
-        <button
-          class="window-button"
-          id="minimize-text-button"
-          aria-label="Minimize terminal"
-          title="Minimize"
-        >_</button>
-      </header>
-
-      <div class="terminal-body">
-        <pre class="ascii" aria-label="Vision Y3454R ASCII logo">
-██╗   ██╗██╗███████╗██╗ ██████╗ ███╗   ██╗
-██║   ██║██║██╔════╝██║██╔═══██╗████╗  ██║
-╚██╗ ██╔╝██║███████╗██║██║   ██║██╔██╗ ██║
- ╚████╔╝ ██║╚════██║██║██║   ██║██║╚██╗██║
-  ╚██╔╝  ██║███████║██║╚██████╔╝██║ ╚████║
-   ╚═╝   ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝</pre>
-
-        <div class="identity">ভীষণ ইয়াসার <span class="muted">//</span> Vision Y3454R</div>
-
-        <div class="intro">
-          <p class="muted">Initializing personal instance...</p>
-          <p class="amber">[system] AI personality loaded.</p>
-          <p>হ্যালো আমি সামিন ইয়াসারের চ্যাটবট ভীষণ ইয়াসার।</p>
-          <p>Hi I am AI version of Vision Y3454R.</p>
-          <p class="muted">What do you want to talk about?</p>
-        </div>
-
-        <div class="divider"></div>
-
-        <div
-          class="output"
-          id="output"
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions"
-        ></div>
-
-        <form id="terminal-form" autocomplete="off">
-          <div class="input-row">
-            <label class="prompt-label" for="command-input">
-              visitor@vision-y3454r:~$
-            </label>
-            <input
-              id="command-input"
-              name="message"
-              type="text"
-              placeholder="type something..."
-              spellcheck="false"
-              autocapitalize="off"
-              aria-label="Type a message or command"
-            />
-          </div>
-          <div class="input-help">
-            try: help · about · projects · research · football · clear
-          </div>
+        <div id="conversation" aria-live="polite"></div>
+        <form class="line input-line" id="form">
+          <span class="prompt">&gt;</span>
+          <input
+            id="message"
+            aria-label="Message"
+            autocomplete="off"
+            autofocus
+          />
         </form>
+      </section>
+    </main>
 
-        <div class="divider"></div>
+    <script>
+      const topics = [
+        "my music?",
+        "my jobs?",
+        "my projects?",
+        "my research?",
+        "my TV shows?",
+      ];
 
-        <footer class="footer">
-          <span id="connection-status">● MOCK MODE — no AI connected</span>
-          <span>built by Samin Yeasar</span>
-        </footer>
-      </div>
-    </section>
+      let index = 0;
+      const topic = document.getElementById("topic");
+      const conversation = document.getElementById("conversation");
 
-    <div class="page-note">
-      A small experiment in building a digital version of a person.
-    </div>
-  </main>
+      setInterval(() => {
+        index = (index + 1) % topics.length;
+        topic.textContent = topics[index];
+      }, 2200);
 
-  <button class="minimized" id="restore-button" type="button">
-    <span>▣</span>
-    <span>ভীষণ ইয়াসার</span>
-    <span class="muted">[restore]</span>
-  </button>
-
-  <script>
-    const form = document.querySelector("#terminal-form");
-    const input = document.querySelector("#command-input");
-    const output = document.querySelector("#output");
-    const status = document.querySelector("#connection-status");
-
-    const closeButton = document.querySelector("#close-button");
-    const minimizeButton = document.querySelector("#minimize-button");
-    const minimizeTextButton = document.querySelector("#minimize-text-button");
-    const focusButton = document.querySelector("#focus-button");
-    const restoreButton = document.querySelector("#restore-button");
-
-    let requestNumber = 0;
-    let busy = false;
-
-    function appendLine(text, className = "line") {
-      const element = document.createElement("div");
-      element.className = className;
-      element.textContent = text;
-      output.appendChild(element);
-      output.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      return element;
-    }
-
-    function minimizeTerminal() {
-      document.body.classList.add("is-minimized");
-    }
-
-    function restoreTerminal() {
-      document.body.classList.remove("is-minimized");
-      input.focus();
-    }
-
-    function handleCommand(command) {
-      switch (command.toLowerCase()) {
-        case "help":
-          return [
-            "Available commands:",
-            "  help      show this message",
-            "  about     who is Vision Y3454R?",
-            "  projects  explore my projects",
-            "  research  my research interests",
-            "  football  talk football with me",
-            "  books     books and reading",
-            "  clear     clear the terminal",
-            "  minimize  minimize this shell",
-            "  whoami    identify this instance"
-          ].join("\n");
-
-        case "about":
-        case "whoami":
-          return "I am ভীষণ ইয়াসার, also known as Vision Y3454R. An AI representation of Samin Yeasar. Still under construction, bhai.";
-
-        case "projects":
-          return "Projects module not connected yet. The knowledge base is still being built.";
-
-        case "research":
-          return "Research module not connected yet. Ask me again when the brain is online.";
-
-        case "football":
-          return "Football? Now we're talking. Unfortunately, my brain is currently running on broke mode.";
-
-        case "books":
-          return "The bookshelf module is under construction. No fake reading lists, please.";
-
-        case "clear":
-          output.replaceChildren();
-          return null;
-
-        case "minimize":
-          minimizeTerminal();
-          return "Going quiet. Find me in the corner.";
-
-        case "exit":
-        case "quit":
-          minimizeTerminal();
-          return "Session suspended. See you around.";
-
-        default:
-          return undefined;
+      function addConversationLine(text, className = "") {
+        const line = document.createElement("p");
+        line.className = `conversation-line ${className}`.trim();
+        const prompt = document.createElement("span");
+        prompt.className = "prompt";
+        prompt.textContent = "> ";
+        const content = document.createElement("span");
+        content.textContent = text;
+        line.append(prompt, content);
+        conversation.append(line);
       }
-    }
 
-    function askMockAI(message) {
-      // Deliberately mocked: this does not call an AI API.
-      return new Promise((resolve) => {
-        window.setTimeout(() => {
-          resolve("yeee, sorry I am broke. can you give me your API key?");
-        }, 450 + Math.random() * 550);
+      document.getElementById("form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const message = document.getElementById("message").value.trim();
+        if (!message) return;
+        addConversationLine(message);
+        addConversationLine(
+          "yeee, sorry I am broke. can you give me your API key?",
+          "reply",
+        );
+        document.getElementById("message").value = "";
       });
-    }
-
-    async function submitMessage(message) {
-      const id = ++requestNumber;
-      busy = true;
-      input.disabled = true;
-      status.textContent = "● PROCESSING — mock response";
-
-      const responseElement = appendLine(
-        "[vision-y3454r]: processing query...",
-        "response muted"
-      );
-
-      await new Promise((resolve) => {
-        window.setTimeout(resolve, 350);
-      });
-
-      if (id !== requestNumber) return;
-
-      responseElement.textContent = "[vision-y3454r]: API_KEY_NOT_FOUND";
-
-      const response = await askMockAI(message);
-
-      if (id !== requestNumber) return;
-
-      responseElement.textContent =
-        "[vision-y3454r]: API_KEY_NOT_FOUND\n\n" + response;
-
-      appendLine("process exited with status 1", "line muted");
-
-      busy = false;
-      input.disabled = false;
-      status.textContent = "● MOCK MODE — no AI connected";
-      input.focus();
-    }
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      if (busy) return;
-
-      const message = input.value.trim();
-      if (!message) return;
-
-      appendLine(
-        "visitor@vision-y3454r:~$ " + message,
-        "line prompt"
-      );
-
-      input.value = "";
-
-      const result = handleCommand(message);
-
-      if (result !== undefined) {
-        if (result !== null) {
-          appendLine(result, "response");
-        }
-        return;
-      }
-
-      await submitMessage(message);
-    });
-
-    minimizeButton.addEventListener("click", minimizeTerminal);
-    minimizeTextButton.addEventListener("click", minimizeTerminal);
-    restoreButton.addEventListener("click", restoreTerminal);
-    focusButton.addEventListener("click", () => input.focus());
-    closeButton.addEventListener("click", minimizeTerminal);
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        if (document.body.classList.contains("is-minimized")) {
-          restoreTerminal();
-        } else {
-          minimizeTerminal();
-        }
-      }
-    });
-
-    appendLine(
-      "Connection established. Type 'help' to see available commands.",
-      "line muted"
-    );
-  </script>
-</body>
+    </script>
+  </body>
 </html>
-
